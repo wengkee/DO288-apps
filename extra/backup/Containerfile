@@ -7,11 +7,9 @@ LABEL Component="httpd" \
       Release="1"
 
 # Labels consumed by RHOCP
-LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
 
 # This label is used to categorize this image as a builder image in the
 # RHOCP web console.
-LABEL io.openshift.tags="builder"
 
 # Apache HTTP Server DocRoot
 ENV DOCROOT /var/www/html
@@ -21,20 +19,6 @@ RUN   yum install -y --nodocs --disableplugin=subscription-manager httpd && \
       echo "This is the default index page from the s2i-do288-httpd S2I builder image." > ${DOCROOT}/index.html
 
 # Change web server port to 8080
-RUN   sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf
 
 # Copy the S2I scripts to the default location indicated by the
 # io.openshift.s2i.scripts-url LABEL (default is /usr/libexec/s2i)
-COPY  ./s2i/bin /usr/libexec/s2i
-
-ENV   APP_DIRS /var/www /etc/httpd/logs /var/log/httpd /run/httpd
-
-RUN   chown -R 1001:0 $APP_DIRS && \
-      chmod -R g=u $APP_DIRS && \
-      chmod +x /usr/libexec/s2i/*
-
-USER  1001
-
-EXPOSE 8080
-
-CMD   ["usage"]
